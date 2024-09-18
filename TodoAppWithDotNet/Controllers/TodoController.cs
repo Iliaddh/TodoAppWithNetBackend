@@ -26,8 +26,15 @@ namespace TodoAppWithDotNet.Controllers
         public async Task<ActionResult<Todo>> PostToDoItem(Todo toDoItem)
         {
             //toDoItem.Id = _random.Next(10000, 100000);
-            _context.Todos.Add(toDoItem);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Todos.Add(toDoItem);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex) { 
+                return BadRequest("Problem occured when adding todo to database");
+            
+            }
 
             return CreatedAtAction(nameof(GetTodoById), new { id = toDoItem.Id }, toDoItem);
         }
@@ -40,7 +47,7 @@ namespace TodoAppWithDotNet.Controllers
 
             if(todo == null)
             {
-                return NotFound();
+                return NotFound("Todo Not Found!");
             }
 
             return Ok(todo);
@@ -58,7 +65,7 @@ namespace TodoAppWithDotNet.Controllers
             }
             catch (Exception ex) {
 
-                return BadRequest(ex.Message);
+                return BadRequest("Todo Not Found!");
             }
 
            
@@ -72,7 +79,7 @@ namespace TodoAppWithDotNet.Controllers
             var todo = await _context.Todos.FindAsync(id);
             if (todo == null)
             {
-                return NotFound();
+                return NotFound("Todo doesnt exist!");
             }
 
             _context.Todos.Remove(todo);
