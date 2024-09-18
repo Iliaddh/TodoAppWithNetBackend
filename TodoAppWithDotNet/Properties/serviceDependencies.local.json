@@ -7,6 +7,14 @@
       "type": "mssql.azure",
       "connectionId": "ConnectionStrings:DatabaseConnection",
       "dynamicId": null
+    },
+    "mssql2": {
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ServiceLinker/locations/eastus/connectors/ConnectionStringsDatabaseConnection1_D5D8DFD238",
+      "secretStore": "LocalSecretsFile",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/todoapp2003/databases/todoapp",
+      "type": "mssql.azure",
+      "connectionId": "ConnectionStrings:DatabaseConnection1",
+      "dynamicId": null
     }
   }
 }

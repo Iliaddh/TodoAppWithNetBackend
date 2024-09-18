@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "zgzIy6gANtWxV8KJjCaQvd/C/IHbU4H2jjXlXW5A110=",
+  "Source": "TodoAppWithDotNet",
+  "BasePath": "_content/TodoAppWithDotNet",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

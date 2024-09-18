@@ -1,26 +1,37 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TodoAppWithDotNet.Data;
 using TodoAppWithDotNet.Models;
-using System.Threading;
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace TodoAppWithDotNet.Controllers
 {
     public class TodoController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-
+        private readonly Random _random = new Random();
         public TodoController(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        [HttpGet]
+        [HttpGet("/")]
         public async Task<ActionResult<IEnumerable<Todo>>> GetTodos()
         {
             return await _context.Todos.ToListAsync();
         }
+
+        //Adding todo
+        [HttpPost("/")]
+        public async Task<ActionResult<Todo>> PostToDoItem(Todo toDoItem)
+        {
+            //toDoItem.Id = _random.Next(10000, 100000);
+            _context.Todos.Add(toDoItem);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetTodoById), new { id = toDoItem.Id }, toDoItem);
+        }
+
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Todo>> GetTodoById(int id)
@@ -36,21 +47,21 @@ namespace TodoAppWithDotNet.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> updateTodo(int id, Todo todo)
+        public async Task<IActionResult> updateTodo(int id, string Title, string Description, Boolean IsCompleted)
         {
-            if(id != todo.Id)
+            try
             {
-                return BadRequest();
+                var existingTodo = await _context.Todos.FindAsync(id);
+                if(Description != null) existingTodo.Description = Description;
+                if(IsCompleted != null) existingTodo.IsCompleted = IsCompleted;
+               if(Title != null) existingTodo.Title = Title;
+            }
+            catch (Exception ex) {
+
+                return BadRequest(ex.Message);
             }
 
-            var existingTodo = await _context.Todos.FindAsync(id);
-            if (existingTodo == null)
-            {
-                return NotFound();
-            }
-
-            existingTodo.Description = todo.Description;
-            existingTodo.IsCompleted = todo.IsCompleted;
+           
 
             await _context.SaveChangesAsync();
             return NoContent();
