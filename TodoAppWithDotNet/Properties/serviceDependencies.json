@@ -9,6 +9,9 @@
       "type": "mssql",
       "connectionId": "ConnectionStrings:DatabaseConnection1",
       "dynamicId": null
+    },
+    "apis1": {
+      "type": "apis"
     }
   }
 }

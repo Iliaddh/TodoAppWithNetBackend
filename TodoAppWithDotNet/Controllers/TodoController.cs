@@ -23,7 +23,7 @@ namespace TodoAppWithDotNet.Controllers
 
         //Adding todo
         [HttpPost("/")]
-        public async Task<ActionResult<Todo>> PostToDoItem(Todo toDoItem)
+        public async Task<ActionResult<Todo>> PostToDoItem([FromBody] Todo toDoItem)
         {
             //toDoItem.Id = _random.Next(10000, 100000);
             try
@@ -54,25 +54,38 @@ namespace TodoAppWithDotNet.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> updateTodo(int id, string Title, string Description, Boolean IsCompleted)
+        public async Task<IActionResult> UpdateTodo(int id, [FromBody] Todo toDoItem)
         {
             try
             {
+                // Find the existing Todo by id
                 var existingTodo = await _context.Todos.FindAsync(id);
-                if(Description != null) existingTodo.Description = Description;
-                if(IsCompleted != null) existingTodo.IsCompleted = IsCompleted;
-               if(Title != null) existingTodo.Title = Title;
+                if (existingTodo == null)
+                {
+                    return NotFound("Todo not found.");
+                }
+
+                // Destructure the body and update the fields conditionally
+                if (toDoItem.Description != null)
+                    existingTodo.Description = toDoItem.Description;
+
+                if (toDoItem.IsCompleted != null)
+                    existingTodo.IsCompleted = toDoItem.IsCompleted;
+
+                if (toDoItem.Title != null)
+                    existingTodo.Title = toDoItem.Title;
+
+                // Save changes to the database
+                await _context.SaveChangesAsync();
+
+                return NoContent(); // Return NoContent to indicate success with no body
             }
-            catch (Exception ex) {
-
-                return BadRequest("Todo Not Found!");
+            catch (Exception ex)
+            {
+                return BadRequest("An error occurred: " + ex.Message);
             }
-
-           
-
-            await _context.SaveChangesAsync();
-            return NoContent();
         }
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTodo(int id) {

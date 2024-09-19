@@ -1,29 +1,31 @@
-# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-# This stage is used when running from VS in fast mode (Default for Debug configuration)
+# Stage 1: Base image with runtime dependencies
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER app
 WORKDIR /app
 EXPOSE 8080
-EXPOSE 8081
 
-
-# This stage is used to build the service project
+# Stage 2: Build the project
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["TodoAppWithDotNet/TodoAppWithDotNet.csproj", "TodoAppWithDotNet/"]
-RUN dotnet restore "./TodoAppWithDotNet/TodoAppWithDotNet.csproj"
+
+# Copy the project file into the container (since you're already in the folder)
+COPY ["TodoAppWithDotNet.csproj", "./"]
+
+# Restore dependencies
+RUN dotnet restore "./TodoAppWithDotNet.csproj"
+
+# Copy the remaining source code
 COPY . .
-WORKDIR "/src/TodoAppWithDotNet"
+
+# Build the app
 RUN dotnet build "./TodoAppWithDotNet.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# This stage is used to publish the service project to be copied to the final stage
+# Stage 3: Publish the app
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./TodoAppWithDotNet.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
+# Stage 4: Final image with the published app
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
